@@ -1,0 +1,42 @@
+name: Convert Markdown to PDF
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y pandoc texlive-xetex texlive-lang-japanese texlive-luatex
+        sudo apt-get install -y npm curl
+        npm install -g @mermaid-js/mermaid-cli
+        curl -o filters/diagram.lua https://raw.githubusercontent.com/pandoc-ext/diagram/refs/heads/main/_extensions/diagram/diagram.lua
+
+    - name: Generate PDFs
+      run: |
+        mkdir -p pdfs
+        for file in designs/*.md; do
+          filename=$(basename -- "$file")
+          pdfname="${filename%.md}.pdf"
+          pandoc "$file" -o "pdfs/$pdfname" --pdf-engine=lualatex -V documentclass=ltjarticle --lua-filter=filters/diagram-generator.lua
+        done
+
+    - name: Upload PDFs
+      uses: actions/upload-artifact@v2
+      with:
+        name: design-pdfs
+        path: pdfs
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./pdfs
