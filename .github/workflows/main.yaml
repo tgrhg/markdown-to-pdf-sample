@@ -28,7 +28,7 @@ jobs:
         for file in designs/*.md; do
           filename=$(basename -- "$file")
           pdfname="${filename%.md}.pdf"
-          pandoc "$file" -o "pdfs/$pdfname" --pdf-engine=lualatex -V documentclass=ltjarticle --lua-filter=diagram.lua
+          pandoc "$file" -o "pdfs/$pdfname" --pdf-engine=lualatex -V documentclass=ltjarticle -V geometry:margin=20mm --lua-filter=diagram.lua
         done
 
     - name: Move PDFs to docs
