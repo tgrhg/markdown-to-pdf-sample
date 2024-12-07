@@ -49,6 +49,7 @@ jobs:
           echo "<li><a href=\"$filename\">$filename</a></li>" >> docs/index.html
         done
         echo '</ul></body></html>' >> docs/index.html
+
     - name: Setup Pages
       uses: actions/configure-pages@v5
 
