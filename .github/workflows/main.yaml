@@ -3,7 +3,7 @@ name: Convert Markdown to PDF
 on:
   push:
     branches:
-      - feature/add_github_actions
+      - main
 
 jobs:
   build:
