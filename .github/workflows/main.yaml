@@ -31,14 +31,22 @@ jobs:
           pandoc "$file" -o "pdfs/$pdfname" --pdf-engine=lualatex -V documentclass=ltjarticle --lua-filter=diagram.lua
         done
 
-    - name: Upload PDFs
-      uses: actions/upload-artifact@v4
-      with:
-        name: design-pdfs
-        path: pdfs
+    - name: Move PDFs to docs
+      run: |
+        mkdir -p docs
+        mv pdfs/* docs/
+
+    - name: Generate index.html
+      run: |
+        echo '<html><body><h1>Generated PDFs</h1><ul>' > docs/index.html
+        for pdf in docs/*.pdf; do
+          filename=$(basename -- "$pdf")
+          echo "<li><a href=\"$filename\">$filename</a></li>" >> docs/index.html
+        done
+        echo '</ul></body></html>' >> docs/index.html
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./pdfs
+        publish_dir: ./docs
